@@ -5,7 +5,9 @@ from rich.console import Console
 from chrona.storage.database import Database
 from chrona.storage.task_repository import TaskRepository
 from chrona.terminal.input_handler import InputHandler
+from chrona.terminal.task_renderer import TaskRenderer
 
+renderer = TaskRenderer()
 
 console = Console()
 
@@ -31,11 +33,9 @@ def list_tasks():
 
     console.print("\n[bold green]Stored Tasks[/bold green]\n")
 
-    for task in tasks:
-        console.print(
-            task.summary(),
-            style="bold cyan"
-        )
+    table = renderer.render_task_table(tasks)
+
+    console.print(table)
 
 
 def main():
@@ -66,11 +66,58 @@ def main():
     elif command == "list":
         list_tasks()
 
+    elif command == "complete":
+
+        if len(sys.argv) < 3:
+            console.print(
+                "[bold red]Task ID required[/bold red]"
+            )
+            return
+
+        task_id = sys.argv[2]
+
+        complete_task(task_id)
+
+    elif command == "delete":
+
+        if len(sys.argv) < 3:
+            console.print(
+                "[bold red]Task ID required[/bold red]"
+            )
+            return
+
+        task_id = sys.argv[2]
+
+        delete_task(task_id)
+
     else:
         console.print(
             f"[bold red]Unknown command:[/bold red] {command}"
         )
 
+def complete_task(task_id: str):
+    success = repository.complete_task(task_id)
+
+    if success:
+        console.print(
+            "[bold green]Task completed successfully[/bold green]"
+        )
+    else:
+        console.print(
+            "[bold red]Task not found[/bold red]"
+        )
+
+def delete_task(task_id: str):
+    success = repository.delete_task(task_id)
+
+    if success:
+        console.print(
+            "[bold green]Task deleted successfully[/bold green]"
+        )
+    else:
+        console.print(
+            "[bold red]Task not found[/bold red]"
+        )
 
 if __name__ == "__main__":
     main()

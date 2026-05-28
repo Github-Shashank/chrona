@@ -58,3 +58,30 @@ class TaskRepository:
             tasks.append(task)
 
         return tasks
+
+    def complete_task(self, task_id: str) -> bool:
+        result = self.database.cursor.execute(
+            """
+            UPDATE tasks
+            SET status = ?
+            WHERE id LIKE ?
+            """,
+            ("completed", f"{task_id}%"),
+        )
+
+        self.database.connection.commit()
+
+        return result.rowcount > 0
+    
+    def delete_task(self, task_id: str) -> bool:
+        result = self.database.cursor.execute(
+            """
+            DELETE FROM tasks
+            WHERE id LIKE ?
+            """,
+            (f"{task_id}%",),
+        )
+
+        self.database.connection.commit()
+
+        return result.rowcount > 0
