@@ -29,6 +29,19 @@ class Database:
             """
         )
 
+        self.cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS timetable_entries (
+                id TEXT PRIMARY KEY,
+                day_of_week TEXT,
+                start_time TEXT,
+                end_time TEXT,
+                activity TEXT,
+                entry_type TEXT
+            )
+            """
+        )
+
         self.connection.commit()
 
     def close(self) -> None:

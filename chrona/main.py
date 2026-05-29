@@ -7,6 +7,18 @@ from chrona.storage.task_repository import TaskRepository
 from chrona.terminal.input_handler import InputHandler
 from chrona.terminal.task_renderer import TaskRenderer
 
+from chrona.storage.timetable_repository import (
+    TimetableRepository,
+)
+
+from chrona.timetable.input_handler import (
+    TimetableInputHandler,
+)
+
+from chrona.timetable.renderer import (
+    TimetableRenderer,
+)
+
 renderer = TaskRenderer()
 
 console = Console()
@@ -18,6 +30,15 @@ repository = TaskRepository(database)
 
 input_handler = InputHandler()
 
+timetable_repository = TimetableRepository(
+    database
+)
+
+timetable_input_handler = (
+    TimetableInputHandler()
+)
+
+timetable_renderer = TimetableRenderer()
 
 def add_task():
     task = input_handler.create_task_from_input()
@@ -90,6 +111,12 @@ def main():
 
         delete_task(task_id)
 
+    elif command == "add-timetable":
+        add_timetable()
+
+    elif command == "show-timetable":
+        show_timetable()
+
     else:
         console.print(
             f"[bold red]Unknown command:[/bold red] {command}"
@@ -118,6 +145,34 @@ def delete_task(task_id: str):
         console.print(
             "[bold red]Task not found[/bold red]"
         )
+
+def add_timetable():
+    entry = (
+        timetable_input_handler
+        .create_entry_from_input()
+    )
+
+    timetable_repository.save_entry(
+        entry
+    )
+
+    console.print(
+        "\n[bold green]Timetable entry added[/bold green]"
+    )
+
+
+def show_timetable():
+    entries = (
+        timetable_repository
+        .get_all_entries()
+    )
+
+    table = timetable_renderer.render_table(
+        entries
+    )
+
+    console.print(table)
+
 
 if __name__ == "__main__":
     main()
